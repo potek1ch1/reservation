@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="content">
+    <p><a href="{{url_for('select_date_time')}}">予約作成</a></p>
+    <p><a href="{{ url_for('confirm_reserve') }}">予約状況確認</a></p>  
+</div>
+
+<style>
+    .content{
+        text-align: center;
+        font-size: 20px;
+    }
+
+    
+</style>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block body %}
+<h2>予約の確認</h2>
+<div id="main">
+  <p><span data-datetime="{{ dateTime }}" id="dateTimeArea"></span>
+    の時間帯で予約しますか？<br>
+    予約を確定する場合は下のボタンを押してください．</p>
+  <a id="next" class="btn btn-primary" href="">予約する</a>
+</div>
+
+<script>
+  let dateTimeArea = document.getElementById("dateTimeArea");
+  let dateTime = dateTimeArea.dataset.datetime;
+  console.log(dateTime)
+  let year = dateTime.substr(0, 4);
+  let month = String(Number(dateTime.substr(5, 2)));
+  let day = String(Number(dateTime.substr(8, 2)));
+  let hour = String(Number(dateTime.substr(11, 2)));
+  let minute = String(dateTime.substr(14, 2));
+  console.log(dateTime, year, month, day, hour, minute);
+  dateTimeArea.innerHTML = `${year}年${month}月${day}日${hour}時${minute}:00〜`;
+
+  document.getElementById("next").setAttribute("href", "./../complete/{{dateTime}}")
+</script>
+
+<style>
+  #next {
+    color: #fff;
+    padding: 10px 30px;
+    display: inline-block;
+    border-radius: 5px;
+    text-decoration: none;
+  }
+
+  #dateTimeArea {
+    font-size: 20px;
+    text-decoration: underline;
+  }
+
+  h2 {
+    text-align: center;
+  }
+
+  #main {
+    text-align: center;
+    margin: 3%;
+  }
+
+  #main a {
+    margin-top: 2%;
+  }
+</style>
+{% endblock %}

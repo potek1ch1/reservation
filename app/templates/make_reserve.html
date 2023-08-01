@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>ご来店予約</h1>
+{{min_date}}
+{{max_date}}
+<div id="main">
+
+    <form action="{{ url_for('make_reserve') }}" method="post">
+        <div class="mb-3">
+            <label for="exampleFormControlInput1" class="form-label">予約日を選択</label>
+            <input type="date" class="form-control" id="exampleFormControlInput1" name="date" min="{{min_date}}" max="{{max_date}}" placeholder="" required />
+        </div>
+        <div class="mb-3">
+            <label for="exampleFormControlInput1" class="form-label">予約時間を選択
+                <input type="time" class="form-control" id="exampleFormControlInput1" name="time" step="1800" min="12:00" max="20:00" required />
+            </label>
+            
+            
+        </div>
+        
+        
+    </form>
+</div>
+<style>
+    #main  {
+        width: 70%;
+    }
+</style>
+{% endblock %}

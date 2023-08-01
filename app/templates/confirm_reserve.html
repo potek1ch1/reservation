@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block body %}
+{% if not reservations %}
+
+<h2>予約はありません</h2>
+{% else %}
+
+<h3>予約状況</h3>
+<div id="main">
+  <table>
+    <tr>
+      <th>ユーザ名</th>
+      <th>日にち</th>
+      <th>時間</th>
+      <th>状況</th>
+      <th>キャンセル</th>
+    </tr>
+    {% for reservation in reservations %}
+
+    <tr>
+      <td>{{ reservation["username"] }}</td>
+      <td>{{ reservation["date"] }}</td>
+      <td>{{ reservation["time"] }}</td>
+      <td>
+        {% if reservation["state"]== 0 %}
+        <span>本予約</span>
+        {% else %}
+        <span>キャンセル待ち</span>
+        {% endif %}
+      </td>
+      <td><a href="{{ url_for('delete_reservation', reservation_id=reservation['id']) }}" class="btn-primary rounded-pill">キャンセル</a></td>
+    </tr>
+
+    {% endfor %}
+
+  </table>
+</div>
+{% endif %}
+<div id="button">
+  <button class="btn btn-primary" onclick=location.href="{{url_for('display_menue')}}">メニューに戻る</button>
+</div>
+
+<style>
+  #main {
+    margin: 3% auto;
+    width: 70%;
+  }
+
+  table {
+    text-align: center;
+    margin: auto;
+    width: 70%;
+  }
+
+  tr {
+    height: 40px;
+  }
+
+  table,
+  td,
+  th {
+    border: solid 1px;
+  }
+
+  h2,
+  h3 {
+    text-align: center;
+  }
+
+  td a {
+    padding: 5%;
+    text-decoration: none;
+  }
+
+  #button {
+    text-align: center;
+    margin: 3%;
+  }
+
+  button {
+    height: 50px;
+  }
+</style>
+
+{% endblock %}

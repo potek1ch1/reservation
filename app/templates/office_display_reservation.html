@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+{% block body %}
+<div id="menue"><a href="./../menue" class="btn btn-primary">メニューに戻る</a></div>
+<div id="main">
+  <h2 data-date="{{date}}" id="header"></h2>
+  <div id="pagenation">
+    <a id="prev" href="">前日</a>
+    <a id="today" href="">今日</a>
+    <a id="next" href="">翌日</a>
+  </div>
+  <h2>本予約</h2>
+  <div id="display"></div>
+  <div id="subTitle"></div>
+  <div id="subDisplay"></div>
+</div>
+
+
+<script>
+  window.onload = () => {
+    var head = document.getElementsByTagName('head')
+    var script = document.createElement('script')
+    script.setAttribute('src', 'https://code.jquery.com/jquery-1.12.4.min.js')
+    script.setAttribute('type', 'text/javascript')
+    //日付の表示
+    let header = document.getElementById("header");
+    let date = header.dataset.date;
+    let year = date.substr(0, 4);
+    let month = String(Number(date.substr(5, 2)));
+    let day = String(Number(date.substr(8, 2)));
+    header.innerHTML = `${year}年${month}月${day}日の予約`;
+
+    //今日ボタンの表示と処理
+    let today = document.getElementById("today");
+    let todayDate = new Date();
+    let todayDay = todayDate.getDate();
+    let todayMonth = todayDate.getMonth() + 1;
+    let todayYear = todayDate.getFullYear();
+    todayMonth = ("0" + todayMonth).slice(-2);
+    todayDay = ("0" + todayDay).slice(-2);
+    let fullyDate = `${todayYear}-${todayMonth}-${todayDay}`;
+    let todayPath = `./${fullyDate}`
+    today.setAttribute("href", todayPath);
+
+
+    //前日，翌日ボタンの表示と処理
+    let prev = document.getElementById("prev");
+    let next = document.getElementById("next");
+
+    let lastDate = new Date(year, Number(month), 0)
+    let lastDay = lastDate.getDate()
+    let lastMonth = lastDate.getMonth()
+
+
+    let nextDay = Number(day) + 1;
+    let nextMonth = Number(month);
+    let nextYear = Number(year);
+
+    if (nextDay > lastDay) {
+      nextMonth += 1;
+      nextDay = 1;
+    }
+    if (nextMonth > 12) {
+      nextYear += 1;
+      nextMonth = 1
+    }
+
+    nextMonth = ("0" + nextMonth).slice(-2)
+    nextDay = ("0" + nextDay).slice(-2)
+    let nextDate = `${nextYear}-${nextMonth}-${nextDay}`;
+
+    let nextPath = `./${nextDate}`
+    next.setAttribute("href", nextPath)
+
+
+    let prevDay = Number(day) - 1;
+    let prevMonth = Number(month);
+    let prevYear = Number(year);
+    let lastDateOfPrev = new Date(year, Number(month) - 1, 0);
+
+
+    if (prevDay < 1) {
+      prevMonth -= 1;
+      prevDay = lastDateOfPrev.getDate()
+    }
+    if (prevMonth < 1) {
+      prevYear -= 1;
+      prevMonth = 12;
+    }
+
+    prevMonth = ("0" + prevMonth).slice(-2)
+    prevDay = ("0" + prevDay).slice(-2)
+    let prevDate = `${prevYear}-${prevMonth}-${prevDay}`;
+    let prevPath = `./${prevDate}`;
+
+
+    if (prevYear > 0) {
+      prev.setAttribute("href", prevPath)
+    }
+
+    /*
+    let path = `./reservation/${sendDate}`;
+    console.log(path)
+    document.getElementById("send").setAttribute("href", path);
+    */
+
+    /*
+     tableData = tableData.slice(1, tableData.length - 1)
+     console.log(tableData)
+
+     let array = [];
+     let word = ""
+     for (let i = 0; i < tableData.length; i++) {
+         word += tableData[i];
+         if(tableData[i] == "}"){
+           word = word.replace(/'/g, "\"")
+           console.log(word)
+           array.push(JSON.parse(word));
+           word = ""
+           i += 1
+         }
+     }
+     console.log(array)
+     */
+    let startTime = 12
+    let closeTime = 20
+
+    function makeTable(data) {
+      let subFlg = false;
+      let count = 0;
+      let mainTable = "<table><th class='timeTable'>時間</th><th class='name'>名前</th><th>キャンセル</th>";
+      let subTable = mainTable
+      for (let i = startTime; i <= closeTime; i++) {
+        let exist = false;
+        mainTable += "<tr>";
+        mainTable += `<td class='timeTable'>${i}:00〜</td>`;
+        for (let j = 0; j < data.length; j++) {
+          let tmpData = data[j];
+          if (Math.floor(tmpData["time"] / 3600) == i) {
+            exist = true;
+            if (tmpData["state"] == 0) {
+              mainTable += `<td class="name">${tmpData["username"]}</td><td><a href="./../delete_reservation/${tmpData['id']}/${date}" class="btn-primary">削除</a></td>`
+            } else {
+              subFlg = true;
+              subTable += `<tr><td>${i}:00〜</td><td>${tmpData["username"]}</td><td><a href="./../delete_reservation/${tmpData['id']}/${date}" class="btn-primary rounded-pill">削除</a></td></tr>`;
+            }
+          }
+        }
+        if (exist == false) {
+          mainTable += "<td class='name'>ー</td><td>ー</td>"
+        }
+        mainTable += "</tr>";
+        subTable += "</tr>"
+      }
+      mainTable += "</table>"
+      subTable += "</table>"
+      document.getElementById("display").innerHTML = mainTable;
+      if (subFlg == true) {
+        document.getElementById("subTitle").innerHTML = "<h2>キャンセル待ち枠</h2>"
+        document.getElementById("subDisplay").innerHTML = subTable;
+      }
+    }
+
+
+
+    script.addEventListener('load', function () {
+      $.ajax({
+          url: `/office/reservation/date/${date}`,
+          type: 'GET',
+          dataType: 'json',
+        })
+        //通信成功時の処理
+        .done(function (data) {
+          let table = "<table>"
+          for (let i = 0; i < data.length; i++) {
+            table += "<tr>" + "<td>" + data[i]["username"] + "</td>" + "<td>" + Math.floor(data[i]["time"] / 3600) + "</td>" + "<td>" + data[i]["state"] + "</td>" + "</tr>";
+            console.log(i)
+          }
+          table += "</table>"
+          $('#result').html(table);
+          console.log(table);
+          let dict = {};
+          let filled = [];
+          for (let j = 0; j < data.length; j++) {
+            let calcTime = Math.floor(data[j]["time"] / 3600)
+            filled.push(calcTime);
+            dict[`${calcTime}`] = data[j]["state"]
+
+          }
+          console.log(filled)
+          console.log(dict)
+          makeTable(data);
+        })
+        //通信失敗時の処理
+        .fail(function () {
+          window.alert('データが取れていません');
+        })
+    })
+    document.head.appendChild(script)
+
+
+
+  }
+</script>
+
+<style>
+  #menue {
+    position: absolute;
+    top: 5%;
+    left: 20%;
+  }
+
+  #main {
+    text-align: center;
+    margin-bottom: 5%;
+  }
+
+  table,
+  td,
+  th {
+    border: solid 1px;
+  }
+
+  .timeTable {
+    width: 25%;
+  }
+
+  .name {
+    width: 50%;
+  }
+
+  #pagenation {
+    padding: 20px;
+    margin-bottom: 1%;
+  }
+
+  table {
+    text-align: center;
+    margin: auto;
+    width: 60%;
+  }
+
+  tr {
+    height: 40px;
+  }
+
+  td a {
+    padding: 2% 8% 2% 8%;
+    border-radius: 5rem;
+    text-decoration: none;
+  }
+
+  #next,
+  #prev,
+  #today {
+    color: #fff;
+    background: #5876a3;
+    padding: 10px 30px;
+    display: inline-block;
+    border-radius: 5px;
+    text-decoration: none;
+  }
+
+  #next:hover,
+  #prev:hover,
+  #today:hover {
+    text-decoration: underline;
+    opacity: 0.7;
+  }
+
+  table tr:nth-child(odd) td {
+    background: rgb(248, 248, 248);
+  }
+</style>
+
+{% endblock %}

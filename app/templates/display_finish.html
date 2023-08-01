@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block body %}
+<h2>
+  {% if reserve %}
+  {{reserve}}
+  {% endif %}
+  {% if sub %}
+  {{ sub }}
+  {% endif %}
+
+  が完了しました
+</h2>
+<div id="main">
+  <div id="confirm" data-datetime="{{dateTime}}">
+   <p>以下の内容で送信しました</p>
+   <div>
+    <ul>
+      <li>
+        お名前: {{ username }} さん
+      </li>
+      <li id="date"></li>
+      <li id="time"></li>
+    </ul>
+  </div>
+  </div>
+  <div id="button">
+    <button class="btn btn-primary" onclick=location.href="{{url_for('display_menue')}}">メニューに戻る</button>
+  </div>
+</div>
+</div>
+
+<style>
+  #main {
+    margin: 3% auto;
+    width: 70%;
+    text-align: center;
+  }
+  
+  #confirm {
+    margin: auto;
+    text-align: center;
+    
+  }
+  
+  #confirm div{
+    width: 30%;
+    margin: auto;
+  }
+  
+  h2 {
+    text-align: center;
+  }
+
+  #button{
+    text-align: center;
+  }
+
+  button{
+    height: 50px;
+  }
+
+
+</style>
+<script>
+  let confirm = document.getElementById("confirm");
+  let dateTime = confirm.dataset.datetime;
+  let year = dateTime.substr(0, 4);
+  let month = String(Number(dateTime.substr(5, 2)));
+  let day = String(Number(dateTime.substr(8, 2)));
+  let hour = String(Number(dateTime.substr(11, 2)));
+  let minute = String(dateTime.substr(14, 2));
+  let date = `日にち: ${year}年${month}月${day}日`;
+  let time = `時間: ${hour}:00`;
+  document.getElementById("date").innerHTML = date;
+  document.getElementById("time").innerHTML = time;
+</script>
+{% endblock %}

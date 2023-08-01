@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block body %}
+
+予約日:{{ year }}年{{ month }}月{{ day }}日<br>
+時間: {{ hour }}時{{ minute }}分
+{{time}}
+<div>
+  <button class="btn btn-primary" onclick=location.href="{{url_for('display_menue')}}">メニューに戻る</button>
+</div>
+{% endblock %}
